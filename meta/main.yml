@@ -1,0 +1,9 @@
+galaxy_info:
+  role_name: zscaler-ansible
+  author: FM Logistic Laboratory
+  description: Zscaler Ansible Module
+  company: FM Logistic Laboratory
+  license: MIT
+  min_ansible_version: 1.2
+  galaxy_tags: []
+dependencies: []
