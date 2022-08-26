@@ -30,18 +30,18 @@ def main():
     
     # Copy the module document fragments to the module docs directory so the 
     # documentation fragments display properly for the modules
-    module_doc_path = os.path.join(ansible_path, 'plugins', 'doc_fragments')
-    if not os.path.exists(module_doc_path):
-        module_doc_path = os.path.join(ansible_path, 'utils', 'module_docs_fragments')
-        if not os.path.exists(module_doc_path):
-            print('Could not find ansible document module path: %s' % module_doc_path)
-            sys.exit(1)
+    # module_doc_path = os.path.join(ansible_path, 'plugins', 'doc_fragments')
+    # if not os.path.exists(module_doc_path):
+    #     module_doc_path = os.path.join(ansible_path, 'utils', 'module_docs_fragments')
+    #     if not os.path.exists(module_doc_path):
+    #         print('Could not find ansible document module path: %s' % module_doc_path)
+    #         sys.exit(1)
 
-    here_doc_fragments = os.path.join(here, 'doc_fragments')
-    for filename in os.listdir(here_doc_fragments):
-        print("Copying doc fragment: %s to: %s" % (filename, module_doc_path))
-        shutil.copy(os.path.join(here_doc_fragments, filename),
-                    os.path.join(module_doc_path, filename))
+    # here_doc_fragments = os.path.join(here, 'doc_fragments')
+    # for filename in os.listdir(here_doc_fragments):
+    #     print("Copying doc fragment: %s to: %s" % (filename, module_doc_path))
+    #     shutil.copy(os.path.join(here_doc_fragments, filename),
+    #                 os.path.join(module_doc_path, filename))
 
     # Copy the base zscaler_util into module_utils directory
     module_util_path = os.path.join(ansible_path, 'module_utils')
