@@ -4,16 +4,35 @@ import traceback, logging
 from ansible.module_utils.basic import AnsibleModule 
 from ansible.module_utils.zscaler_util import ZscalerClient
 
+logger = logging.getLogger('ansible-zscaler-location')
+
 TIME_UNIT = ["MINUTE", "HOUR", "DAY"]
 PROFILE_VALUES = ["NONE", "CORPORATE", "SERVER", "GUESTWIFI", "IOT"]
 
 ZSCALER_COUNTRY = {
     None : "NONE",
-    'FR': "FRANCE"
+    'FR': "FRANCE",
+    'PL': "POLAND",
+    'ES': "SPAIN",
+    'IT': "ITALY",
+    'CZ': "CZECH_REPUBLIC",
+    'RO': "ROMANIA",
+    'UA': "UKRAINE",
+    'BR': "BRAZIL",
+    'BG': "BULGARIA",
+    'HU': "HUNGARY"
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
-    'Europe/Paris': "FRANCE_EUROPE_PARIS"
+    'Europe/Paris': "FRANCE_EUROPE_PARIS",
+    'Europe/Warsaw': "POLAND_EUROPE_WARSAW",
+    'Europe/Madrid': "SPAIN_EUROPE_MADRID",
+    'Europe/Rome': "ITALY_EUROPE_ROME",
+    'Europe/Prague': "CZECH_REPUBLIC_EUROPE_PRAGUE",
+    'Europe/Bucharest': "ROMANIA_EUROPE_BUCHAREST",
+    'Europe/Kiev' : "UKRAINE_EUROPE_KIEV",
+    'Europe/Sofia': "BULGARIA_EUROPE_SOFIA",
+    'Europe/Budapest': "HUNGARY_EUROPE_BUDAPEST"
 }
 
     # upBandwidth: "{{ (item.bandwidth.up * 1024) * 0.8 }}"
@@ -63,16 +82,18 @@ def compare_location(req, get):
                 equal &= test[key]
             else:
                 test[key] = req[key] == get[key]
+                logger.info('Test Key=%s, Req=%s, Get=%s, Test=%s', key, req[key], get[key], test[key])
                 equal &= test[key]
         else:
             test[key] = False
+            logger.info('Test Key=%s, Req=%s, Get=Missing, Test=%s', key, req[key], test[key])
             equal &= test[key]
     return (equal, test)
 
 
 def main(): 
 
-    logging.basicConfig(filename="/tmp/zscaler_util.log", filemode = "a", level = logging.DEBUG)
+    logging.basicConfig(filename="/tmp/zscaler_util.log", filemode = "a", level = logging.INFO)
 
     module = AnsibleModule( 
         argument_spec=dict( 
@@ -199,8 +220,10 @@ def main():
         if groups:
             req['staticLocationGroups'] = groups
         
-        # Euh comment dire ! 
-        req.pop('surrogateRefreshTimeInMinutes') 
+        if req['surrogateIP'] == False:
+            req.pop('surrogateIPEnforcedForKnownBrowsers')
+            req.pop('surrogateRefreshTimeInMinutes')
+            req.pop('surrogateRefreshTimeUnit')
 
     else:
         vpnCredentials = []
@@ -215,6 +238,10 @@ def main():
         req.pop('parentName')
         req.pop('subLocation')
         req.pop('countryCode')
+        if req['surrogateIP'] == False:
+            req.pop('surrogateIPEnforcedForKnownBrowsers')
+            req.pop('surrogateRefreshTimeInMinutes')
+            req.pop('surrogateRefreshTimeUnit')
         req['country'] = ZSCALER_COUNTRY[module.params.get('countryCode')]
         req['tz'] = ZSCALER_TZ[module.params.get('tz')]
         req['upBandwidth'] = int(float(module.params.get('upBandwidth')) * 1024 * 0.8)

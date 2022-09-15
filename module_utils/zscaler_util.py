@@ -149,5 +149,4 @@ if __name__ == "__main__":
     zcli.login()
     zcli.get('staticIP', params={'ipAddress':'12.1.1.1'})
     zcli.logout()
-else:
-    logging.basicConfig(filename="/tmp/zscaler_util.log", filemode = "a", level = logging.DEBUG)
+
