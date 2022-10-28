@@ -11,7 +11,8 @@ def main():
         ip = dict(required=True, type='str'), 
         location = dict(required=True, type='str'), 
         description = dict(required=True, type='str'), 
-        )
+        ),
+        supports_check_mode=True
     )
     changed = False
     _create = False
@@ -47,23 +48,30 @@ def main():
     if len(ret) != 0:
         payload = zcls.get('staticIP/{0}'.format(ret[0]['id']))
 
-    if _create:
-        payload = {
-            "ipAddress": static_ip,
-            "comment": description,
-        }
-        zcls.post('staticIP', payload)
-        changed = True
-        action = "Create"
-    if _update:
-        payload['comment'] = description
-        result = zcls.put('staticIP/{0}'.format(ret[0]['id']), payload)
-        changed = True
-        action = "Update"
-    if _delete: 
-        zcls.delete('staticIP/{0}'.format(ret[0]['id']))
-        action = "Delete"
-        changed = True
+
+    try:
+        if _create:
+            payload = {
+                "ipAddress": static_ip,
+                "comment": description,
+            }
+            if not module.check_mode:
+                zcls.post('staticIP', payload)
+            changed = True
+            action = "Create"
+        if _update:
+            payload['comment'] = description
+            if not module.check_mode:
+                result = zcls.put('staticIP/{0}'.format(ret[0]['id']), payload)
+            changed = True
+            action = "Update"
+        if _delete: 
+            if not module.check_mode:
+                zcls.delete('staticIP/{0}'.format(ret[0]['id']))
+            action = "Delete"
+            changed = True
+    except Exception as err:
+        module.fail_json(msg=str(err), get=get, req=req)
 
     zcls.logout()
 

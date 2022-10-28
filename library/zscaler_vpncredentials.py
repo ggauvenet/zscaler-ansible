@@ -11,7 +11,8 @@ def main():
         ip = dict(required=True, type='str'), 
         psk = dict(required=True, type='str'), 
         description = dict(required=True, type='str'), 
-        )
+        ),
+        supports_check_mode=True
     )
     changed = False
     _create = False
@@ -49,26 +50,33 @@ def main():
         elif 'comments' in payload and payload['comments'] != description:
             _update = True
 
-    if _create:
-        payload = {
-            "ipAddress": ip,
-            "comments": description,
-            "type": "IP",
-            "preSharedKey": psk
-        }
-        zcls.post('vpnCredentials', payload)
-        changed = True
-        action = "Create"
-    if _update:
-        payload['comments'] = description
-        payload['preSharedKey'] = psk
-        result = zcls.put('vpnCredentials/{0}'.format(ret[0]['id']), payload)
-        changed = True
-        action = "Update"
-    if _delete: 
-        zcls.delete('vpnCredentials/{0}'.format(ret[0]['id']))
-        action = "Delete"
-        changed = True
+    try:
+        if _create:
+            payload = {
+                "ipAddress": ip,
+                "comments": description,
+                "type": "IP",
+                "preSharedKey": psk
+            }
+            if not module.check_mode:
+                zcls.post('vpnCredentials', payload)
+            changed = True
+            action = "Create"
+        if _update:
+            payload['comments'] = description
+            payload['preSharedKey'] = psk
+            if not module.check_mode:
+                result = zcls.put('vpnCredentials/{0}'.format(ret[0]['id']), payload)
+            changed = True
+            action = "Update"
+        if _delete: 
+            if not module.check_mode:
+                zcls.delete('vpnCredentials/{0}'.format(ret[0]['id']))
+            action = "Delete"
+            changed = True
+
+    except Exception as err:
+        module.fail_json(msg=str(err), get=get, req=req)
 
     zcls.logout()
 

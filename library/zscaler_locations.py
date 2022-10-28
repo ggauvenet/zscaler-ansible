@@ -129,7 +129,8 @@ def main():
         subLocation = dict(type='bool', default=False),
         parentName = dict(type='str', default=None),
         groups = dict(type='list', elements='str'),
-        )
+        ),
+        supports_check_mode=True
     )
 
     if module.params.get('subLocation') and module.params.get('parentName') == None:
@@ -280,16 +281,19 @@ def main():
     try: 
         if _create:
             #module.fail_json(msg="Test Create", get=get, req=req)
-            zcls.post('locations', req)
+            if not module.check_mode:
+                zcls.post('locations', req)
             changed = True
             action = "Create"
         if _update and (not equal):
             #module.fail_json(msg="Update", get=get, req=req)
-            result = zcls.put('locations/{0}'.format(get['id']), req)
+            if not module.check_mode:
+                result = zcls.put('locations/{0}'.format(get['id']), req)
             changed = True
             action = "Update"
         if _delete: 
-            zcls.delete('locations/{0}'.format(get['id']))
+            if not module.check_mode:
+                zcls.delete('locations/{0}'.format(get['id']))
             action = "Delete"
             changed = True
     except Exception as err:
