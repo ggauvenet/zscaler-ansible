@@ -20,7 +20,8 @@ ZSCALER_COUNTRY = {
     'UA': "UKRAINE",
     'BR': "BRAZIL",
     'BG': "BULGARIA",
-    'HU': "HUNGARY"
+    'HU': "HUNGARY",
+    'RU': "RUSSIAN_FEDERATION"
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
@@ -32,7 +33,22 @@ ZSCALER_TZ = {
     'Europe/Bucharest': "ROMANIA_EUROPE_BUCHAREST",
     'Europe/Kiev' : "UKRAINE_EUROPE_KIEV",
     'Europe/Sofia': "BULGARIA_EUROPE_SOFIA",
-    'Europe/Budapest': "HUNGARY_EUROPE_BUDAPEST"
+    'Europe/Budapest': "HUNGARY_EUROPE_BUDAPEST",
+    'Europe/Moscow': "RUSSIAN_FEDERATION_EUROPE_MOSCOW",
+    'Europe/Kaliningrad': "RUSSIAN_FEDERATION_EUROPE_KALININGRAD",
+    'Europe/Samara': "RUSSIAN_FEDERATION_EUROPE_SAMARA",
+    'Europe/Volgograd': "RUSSIAN_FEDERATION_EUROPE_VOLGOGRAD",
+    'Asia/Anadyr': "RUSSIAN_FEDERATION_ASIA_ANADYR",
+    'Asia/Irkutsk': "RUSSIAN_FEDERATION_ASIA_IRKUTSK",
+    'Asia/Kamchatka': "RUSSIAN_FEDERATION_ASIA_KAMCHATKA",
+    'Asia/Krasnoyarsk': "RUSSIAN_FEDERATION_ASIA_KRASNOYARSK",
+    'Asia/Magadan': "RUSSIAN_FEDERATION_ASIA_MAGADAN",
+    'Asia/Novosibirsk': "RUSSIAN_FEDERATION_ASIA_NOVOSIBIRSK",
+    'Asia/Omsk': "RUSSIAN_FEDERATION_ASIA_OMSK",
+    'Asia/Sakhalin': "RUSSIAN_FEDERATION_ASIA_SAKHALIN",
+    'Asia/Vladivostok': "RUSSIAN_FEDERATION_ASIA_VLADIVOSTOK",
+    'Asia/Yakutsk': "RUSSIAN_FEDERATION_ASIA_YAKUTSK",
+    'Asia/Yekaterinburg': "RUSSIAN_FEDERATION_ASIA_YEKATERINBURG"
 }
 
     # upBandwidth: "{{ (item.bandwidth.up * 1024) * 0.8 }}"
