@@ -21,7 +21,7 @@ ZSCALER_COUNTRY = {
     'BR': "BRAZIL",
     'BG': "BULGARIA",
     'HU': "HUNGARY",
-    'RU': "RUSSIAN_FEDERATION"
+    'RU': "RUSSIA"
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
@@ -34,21 +34,21 @@ ZSCALER_TZ = {
     'Europe/Kiev' : "UKRAINE_EUROPE_KIEV",
     'Europe/Sofia': "BULGARIA_EUROPE_SOFIA",
     'Europe/Budapest': "HUNGARY_EUROPE_BUDAPEST",
-    'Europe/Moscow': "RUSSIAN_FEDERATION_EUROPE_MOSCOW",
-    'Europe/Kaliningrad': "RUSSIAN_FEDERATION_EUROPE_KALININGRAD",
-    'Europe/Samara': "RUSSIAN_FEDERATION_EUROPE_SAMARA",
-    'Europe/Volgograd': "RUSSIAN_FEDERATION_EUROPE_VOLGOGRAD",
-    'Asia/Anadyr': "RUSSIAN_FEDERATION_ASIA_ANADYR",
-    'Asia/Irkutsk': "RUSSIAN_FEDERATION_ASIA_IRKUTSK",
-    'Asia/Kamchatka': "RUSSIAN_FEDERATION_ASIA_KAMCHATKA",
-    'Asia/Krasnoyarsk': "RUSSIAN_FEDERATION_ASIA_KRASNOYARSK",
-    'Asia/Magadan': "RUSSIAN_FEDERATION_ASIA_MAGADAN",
-    'Asia/Novosibirsk': "RUSSIAN_FEDERATION_ASIA_NOVOSIBIRSK",
-    'Asia/Omsk': "RUSSIAN_FEDERATION_ASIA_OMSK",
-    'Asia/Sakhalin': "RUSSIAN_FEDERATION_ASIA_SAKHALIN",
-    'Asia/Vladivostok': "RUSSIAN_FEDERATION_ASIA_VLADIVOSTOK",
-    'Asia/Yakutsk': "RUSSIAN_FEDERATION_ASIA_YAKUTSK",
-    'Asia/Yekaterinburg': "RUSSIAN_FEDERATION_ASIA_YEKATERINBURG"
+    'Europe/Moscow': "RUSSIA_EUROPE_MOSCOW",
+    'Europe/Kaliningrad': "RUSSIA_EUROPE_KALININGRAD",
+    'Europe/Samara': "RUSSIA_EUROPE_SAMARA",
+    'Europe/Volgograd': "RUSSIA_EUROPE_VOLGOGRAD",
+    'Asia/Anadyr': "RUSSIA_ASIA_ANADYR",
+    'Asia/Irkutsk': "RUSSIA_ASIA_IRKUTSK",
+    'Asia/Kamchatka': "RUSSIA_ASIA_KAMCHATKA",
+    'Asia/Krasnoyarsk': "RUSSIA_ASIA_KRASNOYARSK",
+    'Asia/Magadan': "RUSSIA_ASIA_MAGADAN",
+    'Asia/Novosibirsk': "RUSSIA_ASIA_NOVOSIBIRSK",
+    'Asia/Omsk': "RUSSIA_ASIA_OMSK",
+    'Asia/Sakhalin': "RUSSIA_ASIA_SAKHALIN",
+    'Asia/Vladivostok': "RUSSIA_ASIA_VLADIVOSTOK",
+    'Asia/Yakutsk': "RUSSIA_ASIA_YAKUTSK",
+    'Asia/Yekaterinburg': "RUSSIA_ASIA_YEKATERINBURG"
 }
 
     # upBandwidth: "{{ (item.bandwidth.up * 1024) * 0.8 }}"
@@ -87,6 +87,26 @@ def compare_vpnCredentials(req, get):
         testList.append(testDict)
     return equal
 
+def compare_groups(req, get):
+    equal = True
+    if len(req) != len(get):
+        return False
+    for gitem in get:
+        gfound = False
+        for ritem in req:
+            if ritem['id'] == gitem['id']:
+                gfound = True
+        equal &= gfound
+    return equal
+
+def compare_list(req, get):
+    equal = True
+    if len(req) != len(get):
+        return False
+    for gitem in get:
+        equal &= gitem in req
+    return equal
+
 
 def compare_location(req, get):
     equal = True
@@ -95,15 +115,17 @@ def compare_location(req, get):
         if key in get:
             if key == 'vpnCredentials':
                 test[key] = compare_vpnCredentials(req[key], get[key])
-                equal &= test[key]
+            elif key == 'staticLocationGroups':
+                test[key] = compare_groups(req[key], get[key])
+            elif key == 'ipAddresses':
+                test[key] = compare_list(req[key], get[key])
             else:
                 test[key] = req[key] == get[key]
-                logger.info('Test Key=%s, Req=%s, Get=%s, Test=%s', key, req[key], get[key], test[key])
-                equal &= test[key]
         else:
             test[key] = False
-            logger.info('Test Key=%s, Req=%s, Get=Missing, Test=%s', key, req[key], test[key])
-            equal &= test[key]
+        logger.info('Test Key=%s, Req=%s, Get=%s, Test=%s', key, req[key], get[key], test[key])
+        equal &= test[key]
+        
     return (equal, test)
 
 
@@ -195,8 +217,10 @@ def main():
         groups = [] 
         for groupName in module.params.get('groups'):
             groupRet = zcls.get('locations/groups', params=dict(name=groupName))
-            if len(groupRet) > 0:
-                groups.append(dict(id=groupRet[0]['id'], name=groupRet[0]['name']))
+            for gritem in groupRet:
+                if gritem['name'] == groupName:
+                    groups.append(dict(id=gritem['id'], name=gritem['name']))
+        logger.info("Groups= %s", groups)
 
     #module.fail_json(msg="groups", group=groups)
 
