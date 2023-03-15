@@ -21,7 +21,8 @@ ZSCALER_COUNTRY = {
     'BR': "BRAZIL",
     'BG': "BULGARIA",
     'HU': "HUNGARY",
-    'RU': "RUSSIA"
+    'RU': "RUSSIA",
+    'SG': "SINGAPORE",
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
@@ -48,7 +49,23 @@ ZSCALER_TZ = {
     'Asia/Sakhalin': "RUSSIA_ASIA_SAKHALIN",
     'Asia/Vladivostok': "RUSSIA_ASIA_VLADIVOSTOK",
     'Asia/Yakutsk': "RUSSIA_ASIA_YAKUTSK",
-    'Asia/Yekaterinburg': "RUSSIA_ASIA_YEKATERINBURG"
+    'Asia/Yekaterinburg': "RUSSIA_ASIA_YEKATERINBURG",
+    'Asia/Singapore': "SINGAPORE_ASIA_SINGAPORE",
+    'America/Sao_Paulo': "BRAZIL_AMERICA_SAO_PAULO",
+    'America/Rio_Branco': "BRAZIL_AMERICA_RIO_BRANCO",
+    'America/Recife': "BRAZIL_AMERICA_RECIFE",
+    'America/Porto_Velho': "BRAZIL_AMERICA_PORTO_VELHO",
+    'America/Noronha': "BRAZIL_AMERICA_NORONHA",
+    'America/Manaus': "BRAZIL_AMERICA_MANAUS",
+    'America/Maceio': "BRAZIL_AMERICA_MACEIO",
+    'America/Fortaleza': "BRAZIL_AMERICA_FORTALEZA",
+    'America/Eirunepe': "BRAZIL_AMERICA_EIRUNEPE",
+    'America/Cuiaba': "BRAZIL_AMERICA_CUIABA",
+    'America/Campo_Grande': "BRAZIL_AMERICA_CAMPO_GRANDE",
+    'America/Boa_Vista': "BRAZIL_AMERICA_BOA_VISTA",
+    'America/Belem': "BRAZIL_AMERICA_BELEM",
+    'America/Bahia': "BRAZIL_AMERICA_BAHIA",
+    'America/Araguaina': "BRAZIL_AMERICA_ARAGUAINA",
 }
 
     # upBandwidth: "{{ (item.bandwidth.up * 1024) * 0.8 }}"
