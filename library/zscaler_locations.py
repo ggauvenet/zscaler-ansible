@@ -23,6 +23,7 @@ ZSCALER_COUNTRY = {
     'HU': "HUNGARY",
     'RU': "RUSSIA",
     'SG': "SINGAPORE",
+    'RS': "SERBIA",
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
@@ -39,6 +40,7 @@ ZSCALER_TZ = {
     'Europe/Kaliningrad': "RUSSIA_EUROPE_KALININGRAD",
     'Europe/Samara': "RUSSIA_EUROPE_SAMARA",
     'Europe/Volgograd': "RUSSIA_EUROPE_VOLGOGRAD",
+    'Europe/Belgrade' : "SERBIA_EUROPE_BELGRADE",
     'Asia/Anadyr': "RUSSIA_ASIA_ANADYR",
     'Asia/Irkutsk': "RUSSIA_ASIA_IRKUTSK",
     'Asia/Kamchatka': "RUSSIA_ASIA_KAMCHATKA",
