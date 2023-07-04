@@ -143,9 +143,11 @@ def compare_location(req, get):
                 test[key] = compare_list(req[key], get[key])
             else:
                 test[key] = req[key] == get[key]
+            logger.info('Test Key=%s, Req=%s, Get=%s, Test=%s', key, req[key], get[key], test[key])
         else:
             test[key] = False
-        logger.info('Test Key=%s, Req=%s, Get=%s, Test=%s', key, req[key], get[key], test[key])
+            logger.info('Test Key=%s, Req=%s, Get=[Missing Value], Test=%s', key, req[key], test[key])
+        
         equal &= test[key]
         
     return (equal, test)
