@@ -126,7 +126,7 @@ class ZscalerClient:
             return
         logger.debug("[PUT] %s | %s", self._url(uri), json.dumps(payload))
         res = self.session.put(self._url(uri), headers = self.headers, data = json.dumps(payload))
-        logger.debug(str(res) + " | %s | %s", res.text)
+        logger.debug(str(res) + " | %s", res.text)
         time.sleep(0.5)
         return self._manage_response(res)
     
@@ -140,8 +140,6 @@ class ZscalerClient:
             raise Exception(str(res), res.text, res)
 
 
-
-
 if __name__ == "__main__":
     import sys
     logging.basicConfig(stream = sys.stdout, filemode = "w", level = logging.DEBUG)
@@ -149,4 +147,3 @@ if __name__ == "__main__":
     zcli.login()
     zcli.get('staticIP', params={'ipAddress':'12.1.1.1'})
     zcli.logout()
-
