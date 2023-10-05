@@ -5,8 +5,8 @@ import logging
 
 logger = logging.getLogger('zscaler-client')
 
-def obfuscateApiKey(seed):
-    now = int(time.time() * 1000)
+def obfuscateApiKey(seed, date=time.time()):
+    now = int(date * 1000)
     n = str(now)[-6:]
     r = str(int(n) >> 1).zfill(6)
     key = ""
@@ -92,9 +92,10 @@ class ZscalerClient:
         if self.session == None: 
             return
         logger.debug("[POST] %s", self._url(uri))
-        res = self.session.post(self._url(uri), headers = self.headers, data = json.dumps(payload))
-        logger.debug(str(res) + " | %s", payload)
-        time.sleep(0.5)
+        jsdata = json.dumps(payload)
+        res = self.session.post(self._url(uri), headers = self.headers, data = jsdata)
+        logger.debug(str(res) + " | %s", jsdata)
+        time.sleep(2.2)
         if res.status_code >= 200 and res.status_code < 300:
             jv = json.loads(res.text)
             if 'code' in jv and 'message' in jv:
@@ -106,10 +107,10 @@ class ZscalerClient:
     def get(self, uri, params={}):
         if self.session == None: 
             return
-        time.sleep(0.5)
         logger.debug("[GET] %s", self._url(uri))
         res = self.session.get(self._url(uri), headers = self.headers, params=params)
         logger.debug(str(res) + " | %s", res.text)
+        time.sleep(1.2)
         return self._manage_response(res)
 
     def delete(self, uri):
@@ -118,7 +119,7 @@ class ZscalerClient:
         logger.debug("[DELETE] %s", self._url(uri))
         res = self.session.delete(self._url(uri), headers = self.headers)
         logger.debug(str(res) + " | %s", res.text)
-        time.sleep(1)
+        time.sleep(5.2)
         return self._manage_response(res)
 
     def put(self, uri, payload):
@@ -127,7 +128,7 @@ class ZscalerClient:
         logger.debug("[PUT] %s | %s", self._url(uri), json.dumps(payload))
         res = self.session.put(self._url(uri), headers = self.headers, data = json.dumps(payload))
         logger.debug(str(res) + " | %s", res.text)
-        time.sleep(0.5)
+        time.sleep(2.2)
         return self._manage_response(res)
     
     def _manage_response(self, res):
