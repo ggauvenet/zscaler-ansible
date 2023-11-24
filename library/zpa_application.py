@@ -124,7 +124,7 @@ def main():
 
     get = None
 
-    retlist = zcls.get('application', { 'search': name })
+    retlist = zcls.get('application', { 'search': 'name LIKE {0}'.format(name) })
     if 'list' in retlist:
         for appitem in retlist['list']: 
             if appitem['name'] == name:
@@ -145,7 +145,7 @@ def main():
     ################
     if 'segmentGroup' in req: 
         segmentGroupName = req.pop('segmentGroup')
-        retlist = zcls.get('segmentGroup', { 'search': segmentGroupName })
+        retlist = zcls.get('segmentGroup', { 'search': 'name LIKE {0}'.format(segmentGroupName) })
         if 'list' in retlist:
             for segitem in retlist['list']:
                 if segitem['name'] == segmentGroupName: 

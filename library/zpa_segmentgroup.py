@@ -54,7 +54,7 @@ def main():
 
     get = None
 
-    retlist = zcls.get('segmentGroup', { 'search': name })
+    retlist = zcls.get('segmentGroup', { 'search': 'name LIKE {0}'.format(name) })
     if 'list' in retlist:
         for appitem in retlist['list']: 
             if appitem['name'] == name:
