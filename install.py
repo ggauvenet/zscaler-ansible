@@ -56,8 +56,14 @@ def main():
     shutil.copy(os.path.join(here_module_utils, 'zscaler_util.py'),
                 os.path.join(module_util_path, 'zscaler_util.py'))
     print("Copying zscaler_util.py to: %s" % module_util_path)
-    
-    
+
+    # Check for existing .pyc
+    if os.path.exists(os.path.join(module_util_path, 'zpa_util.pyc')):
+        os.remove(os.path.join(module_util_path, 'zpa_util.pyc'))
+
+    shutil.copy(os.path.join(here_module_utils, 'zpa_util.py'),
+                os.path.join(module_util_path, 'zpa_util.py'))
+    print("Copying zpa_util.py to: %s" % module_util_path)
     
     
 if __name__ == '__main__':
