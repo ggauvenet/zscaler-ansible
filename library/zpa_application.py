@@ -41,15 +41,30 @@ def compare_portrange(req, get):
         equal &= gfound
     return equal
 
+def compare_domainName(req, get):
+    if len(req) != len(get):
+        return False
+    equal = True
+    for gitem in get:
+        if not gitem in req:
+            equal &= False
+    for ritem in req:
+        if not ritem in get:
+            equal &= False
+    return equal
+
 def compare_application(req, get):
     equal = True
     test = {}
     for key in req.keys():
         if key in get:
+
             if key == 'tcpPortRange' or key == 'updPortRange':
                 test[key] = compare_portrange(req[key], get[key])
             elif key == 'serverGroups':
                 test[key] = compare_groups(req[key], get[key])
+            elif key in 'domainNames':
+                test[key] = compare_domainName(req[key], get[key])
             elif key in INTEGER_FIELDS:
                 test[key] = str(req[key]) == str(get[key])
             else:
