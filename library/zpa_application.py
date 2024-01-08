@@ -59,7 +59,7 @@ def compare_application(req, get):
     for key in req.keys():
         if key in get:
 
-            if key == 'tcpPortRange' or key == 'updPortRange':
+            if key == 'tcpPortRange' or key == 'udpPortRange':
                 test[key] = compare_portrange(req[key], get[key])
             elif key == 'serverGroups':
                 test[key] = compare_groups(req[key], get[key])
@@ -102,7 +102,7 @@ def main():
             icmpAccessType = dict(type='str', choices=ICMPACCESS_TYPE, default="NONE"),
             bypassType = dict(type='str', choices=BYPASS_TYPE, default="NEVER"),
             tcpPortRange = dict(type='list', elements='dict'),
-            updPortRange = dict(type='list', elements='dict'),
+            udpPortRange = dict(type='list', elements='dict'),
             applicationGroup = dict(type='str'), 
             segmentGroup = dict(type='str'),
             appRecommendation = dict(type='str'),
@@ -156,6 +156,30 @@ def main():
 
     req = module.params.copy()
     req.pop('state')
+
+    ## Description
+    ################
+    if 'description' in req: 
+        if req['description'] == "":
+            req.pop('description')
+
+    ## Port Range
+    ################
+    if 'udpPortRange' in req: 
+        if len(req['udpPortRange']) == 0:
+            req.pop('udpPortRange')
+
+    if 'tcpPortRange' in req: 
+        if len(req['tcpPortRange']) == 0:
+            req.pop('tcpPortRange')
+
+    ## Connector Close to App
+    ################
+    if 'selectConnectorCloseToApp' in req:
+        if req['selectConnectorCloseToApp'] == False:
+            req.pop('defaultIdleTimeout')
+            req.pop('defaultMaxAge')
+
     ## Segment Group
     ################
     if 'segmentGroup' in req: 
