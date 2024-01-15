@@ -10,9 +10,10 @@ _prefix_application = {
     'segmentGroup': 'mgmtconfig/v1', 
     'server': 'mgmtconfig/v1', 
     'serverGroup': 'mgmtconfig/v1',
-    'appConnectorGroup': 'mgmtconfig/v1'
+    'appConnectorGroup': 'mgmtconfig/v1',
+    'policySet': 'mgmtconfig/v1',
+    'samlAttribute': 'mgmtconfig/v2'
 }
-
 
 class ZPAClient:
     tenant_name = None

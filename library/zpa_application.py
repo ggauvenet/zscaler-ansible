@@ -12,9 +12,32 @@ HEALTHCHECK_TYPE = ["DEFAULT", "NONE"]
 HEALTH_REPORTING = ["NONE", "ON_ACCESS", "CONTINUOUS"]
 ICMPACCESS_TYPE = ["PING_TRACEROUTING", "PING", "NONE"]
 PROTOCOLS =  ["NONE","KERBEROS","LDAP","SMB"]
+APPLICATION_PROTOCOL = ["HTTP","HTTPS","FTP","RDP","SSH","WEBSOCKET","VNC"]
+CONNECTION_SECURITY = ["ANY","NLA","NLA_EXT","TLS","VM_CONNECT","RDP"]
 
 INTEGER_FIELDS = ['defaultIdleTimeout', 'defaultMaxAge']
 
+
+def compare_sraapps(req, get):
+    equal = True
+    if len(req) != len(get):
+        return False
+    for gitem in get:
+        gfound = False
+        gequal = True
+        for ritem in req:
+            if ritem['name'] == gitem['name']:
+                test = {}
+                gfound = True
+                for key in ritem.keys():
+                    if key == 'applicationPort':
+                        test[key] = str(ritem[key]) == str(gitem[key])
+                    else:
+                        test[key] = ritem[key] == gitem[key]
+                    gequal &= test[key]
+                    logger.info('Test sraApps Key=%s, Req=%s, Get=%s, Test=%s', key, ritem[key], gitem[key], test[key])
+        equal &= gfound & gequal
+    return equal
 
 def compare_groups(req, get):
     equal = True
@@ -65,6 +88,8 @@ def compare_application(req, get):
                 test[key] = compare_groups(req[key], get[key])
             elif key in 'domainNames':
                 test[key] = compare_domainName(req[key], get[key])
+            elif key in 'sraApps':
+                test[key] = compare_sraapps(req[key], get[key])
             elif key in INTEGER_FIELDS:
                 test[key] = str(req[key]) == str(get[key])
             else:
@@ -119,7 +144,9 @@ def main():
 
             defaultIdleTimeout = dict(type='int', default=0),
             defaultMaxAge = dict(type='int', default=0),
-            clientlessApps = dict(type='list', elements='dict')
+            clientlessApps = dict(type='list', elements='dict'),
+
+            sraApps = dict(type='list', elements='dict')
         ),
         supports_check_mode=True
     )
@@ -179,6 +206,12 @@ def main():
         if req['selectConnectorCloseToApp'] == False:
             req.pop('defaultIdleTimeout')
             req.pop('defaultMaxAge')
+
+    ## RDP / SSH Portal  (sraApps)
+    ################
+    if 'sraApps' in req:
+        if len(req['sraApps']) == 0:
+            req.pop('sraApps')
 
     ## Segment Group
     ################
