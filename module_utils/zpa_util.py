@@ -12,7 +12,8 @@ _prefix_application = {
     'serverGroup': 'mgmtconfig/v1',
     'appConnectorGroup': 'mgmtconfig/v1',
     'policySet': 'mgmtconfig/v1',
-    'samlAttribute': 'mgmtconfig/v2'
+    'samlAttribute': 'mgmtconfig/v2',
+    'certificate': 'mgmtconfig/v1'
 }
 
 class ZPAClient:

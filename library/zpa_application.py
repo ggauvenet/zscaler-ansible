@@ -18,6 +18,27 @@ CONNECTION_SECURITY = ["ANY","NLA","NLA_EXT","TLS","VM_CONNECT","RDP"]
 INTEGER_FIELDS = ['defaultIdleTimeout', 'defaultMaxAge']
 
 
+def compare_clientless(req, get):
+    equal = True
+    if len(req) != len(get):
+        return False
+    for gitem in get:
+        gfound = False
+        gequal = True
+        for ritem in req:
+            if ritem['name'] == gitem['name']:
+                test = {}
+                gfound = True
+                for key in ritem.keys():
+                    if key == 'applicationPort':
+                        test[key] = str(ritem[key]) == str(gitem[key])
+                    else:
+                        test[key] = ritem[key] == gitem[key]
+                    gequal &= test[key]
+                    logger.info('Test clientlessApps Key=%s, Req=%s, Get=%s, Test=%s', key, ritem[key], gitem[key], test[key])
+        equal &= gfound & gequal
+    return equal
+
 def compare_sraapps(req, get):
     equal = True
     if len(req) != len(get):
@@ -90,6 +111,8 @@ def compare_application(req, get):
                 test[key] = compare_domainName(req[key], get[key])
             elif key in 'sraApps':
                 test[key] = compare_sraapps(req[key], get[key])
+            elif key in 'clientlessApps':
+                test[key] = compare_clientless(req[key], get[key])
             elif key in INTEGER_FIELDS:
                 test[key] = str(req[key]) == str(get[key])
             else:
@@ -144,9 +167,10 @@ def main():
 
             defaultIdleTimeout = dict(type='int', default=0),
             defaultMaxAge = dict(type='int', default=0),
-            clientlessApps = dict(type='list', elements='dict'),
 
-            sraApps = dict(type='list', elements='dict')
+            clientlessApps = dict(type='list', elements='dict', default=[]),
+
+            sraApps = dict(type='list', elements='dict', default=[])
         ),
         supports_check_mode=True
     )
@@ -212,6 +236,31 @@ def main():
     if 'sraApps' in req:
         if len(req['sraApps']) == 0:
             req.pop('sraApps')
+
+    ## HTTP / HTTPS Portal (clientlessApps)
+    if'clientlessApps' in req:
+        if len(req['clientlessApps']) == 0:
+            req.pop('clientlessApps')
+        else:
+            certlist = zcls.get('certificate', { 'pagesize': '500'})
+            for i in range(len(req['clientlessApps'])):
+                if not 'name' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['name'] = req['clientlessApps'][i]['domain']
+                if 'certificateName' in req['clientlessApps'][i]:
+                    for certitem in certlist['list']:
+                        if certitem['name'] == req['clientlessApps'][i]['certificateName']:
+                            req['clientlessApps'][i]['certificateId'] = certitem['id']
+                if not 'enabled' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['enabled'] = True
+                if not 'hidden' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['hidden'] = False
+                if not 'portal' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['portal'] = False
+                if not 'trustUntrustedCert' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['trustUntrustedCert'] = False
+                if not 'allowOptions' in req['clientlessApps'][i]:
+                    req['clientlessApps'][i]['allowOptions'] = False
+        
 
     ## Segment Group
     ################
