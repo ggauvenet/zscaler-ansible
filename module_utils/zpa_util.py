@@ -100,7 +100,7 @@ class ZPAClient:
         jsdata = json.dumps(payload)
         time.sleep(2.2)
         res = self.session.post(self._url(uri), headers = self.headers, data = jsdata)
-        logger.debug(str(res) + " | %s", jsdata)
+        logger.debug("%s | %s | %s", str(res), res.text, jsdata)
         return self._manage_response(res)
 
     def get(self, uri, params={}):
@@ -127,7 +127,7 @@ class ZPAClient:
         logger.debug("[PUT] %s | %s", self._url(uri), json.dumps(payload))
         time.sleep(2.2)
         res = self.session.put(self._url(uri), headers = self.headers, data = json.dumps(payload))
-        logger.debug(str(res) + " | %s", res.text)
+        logger.debug("%s | %s", str(res), res.text)
         return self._manage_response(res)
     
     def _manage_response(self, res):

@@ -15,7 +15,7 @@ PROTOCOLS =  ["NONE","KERBEROS","LDAP","SMB"]
 APPLICATION_PROTOCOL = ["HTTP","HTTPS","FTP","RDP","SSH","WEBSOCKET","VNC"]
 CONNECTION_SECURITY = ["ANY","NLA","NLA_EXT","TLS","VM_CONNECT","RDP"]
 
-INTEGER_FIELDS = ['defaultIdleTimeout', 'defaultMaxAge']
+INTEGER_FIELDS = ['defaultIdleTimeout', 'defaultMaxAge', 'tcpKeepAlive']
 
 
 def compare_clientless(req, get):
@@ -51,12 +51,17 @@ def compare_sraapps(req, get):
                 test = {}
                 gfound = True
                 for key in ritem.keys():
-                    if key == 'applicationPort':
-                        test[key] = str(ritem[key]) == str(gitem[key])
+                    if key in gitem:
+                        if key == 'applicationPort':
+                            test[key] = str(ritem[key]) == str(gitem[key])
+                        else:
+                            test[key] = ritem[key] == gitem[key]
+                        
+                        logger.info('Test sraApps Key=%s, Req=%s, Get=%s, Test=%s', key, ritem[key], gitem[key], test[key])
                     else:
-                        test[key] = ritem[key] == gitem[key]
+                        test[key] = False
+                        logger.info('Test sraApps Key=%s, Req=%s, Get=[Missing], Test=%s', key, ritem[key], test[key])
                     gequal &= test[key]
-                    logger.info('Test sraApps Key=%s, Req=%s, Get=%s, Test=%s', key, ritem[key], gitem[key], test[key])
         equal &= gfound & gequal
     return equal
 
@@ -109,7 +114,7 @@ def compare_application(req, get):
                 test[key] = compare_groups(req[key], get[key])
             elif key in 'domainNames':
                 test[key] = compare_domainName(req[key], get[key])
-            elif key in 'sraApps':
+            elif key in 'praApps':
                 test[key] = compare_sraapps(req[key], get[key])
             elif key in 'clientlessApps':
                 test[key] = compare_clientless(req[key], get[key])
@@ -143,6 +148,7 @@ def main():
             healthCheckType = dict(type='str', choices=HEALTHCHECK_TYPE, default="DEFAULT"),
             healthReporting = dict(type='str', choices=HEALTH_REPORTING, default="ON_ACCESS"),
             passiveHealthEnabled = dict(type='bool', default=True),
+            tcpKeepAlive = dict(type='int', default=0),
 
             ipAnchored = dict(type='bool', default=False),
             doubleEncrypt = dict(type='bool', default=False),
@@ -162,6 +168,9 @@ def main():
             bypassOnReauth = dict(type='bool', default=False),
             inspectTrafficWithZia = dict(type='bool', default=False),
             useInDrMode = dict(type='bool', default=False),
+            isIncompleteDRConfig = dict(type='bool', default=False),
+
+            fqdnDnsCheck = dict(type='bool', default=False),
 
             selectConnectorCloseToApp = dict(type='bool', default=True),
 
@@ -170,7 +179,10 @@ def main():
 
             clientlessApps = dict(type='list', elements='dict', default=[]),
 
-            sraApps = dict(type='list', elements='dict', default=[])
+            sraApps = dict(type='list', elements='dict', default=[]),
+
+            microtenantName  = dict(type='str', default="Default")
+
         ),
         supports_check_mode=True
     )
@@ -236,6 +248,23 @@ def main():
     if 'sraApps' in req:
         if len(req['sraApps']) == 0:
             req.pop('sraApps')
+        else:
+            if get and 'praApps' in get:
+                req['praApps'] = req.pop('sraApps')
+                for i in range(len(req['praApps'])):
+                    req['praApps'][i]['appId'] = get['id']
+                    if not 'name' in req['praApps'][i]:
+                        req['praApps'][i]['name'] = req['praApps'][i]['domain']
+            else:
+                req['commonAppsDto'] = {}
+                req['commonAppsDto']['appsConfig'] = req.pop('sraApps')
+                for i in range(len(req['commonAppsDto']['appsConfig'])):
+                    req['commonAppsDto']['appsConfig'][i]['appTypes'] = ["SECURE_REMOTE_ACCESS"]
+                    if not 'name' in req['commonAppsDto']['appsConfig'][i]:
+                        req['commonAppsDto']['appsConfig'][i]['name'] = req['commonAppsDto']['appsConfig'][i]['domain']
+                    if get:
+                        req['commonAppsDto']['appsConfig'][i]['appId'] = get['id']
+    
 
     ## HTTP / HTTPS Portal (clientlessApps)
     if'clientlessApps' in req:
