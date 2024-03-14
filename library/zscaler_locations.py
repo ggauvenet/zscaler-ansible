@@ -25,6 +25,7 @@ ZSCALER_COUNTRY = {
     'SG': "SINGAPORE",
     'RS': "SERBIA",
     'VN': "VIETNAM",
+    'IN': "INDIA",
 }
 ZSCALER_TZ = { 
     None: "NOT_SPECIFIED",
@@ -71,6 +72,7 @@ ZSCALER_TZ = {
     'America/Araguaina': "BRAZIL_AMERICA_ARAGUAINA",
     'Asia/Saigon': "VIETNAM_ASIA_SAIGON",
     'Asia/Ho_Chi_Minh': "VIETNAM_ASIA_SAIGON",
+    'IST': "GMT_05_30_INDIA_GMT_05_30",
 }
 
     # upBandwidth: "{{ (item.bandwidth.up * 1024) * 0.8 }}"
