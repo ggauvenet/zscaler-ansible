@@ -277,6 +277,8 @@ def main():
         else:
             req['dnBandwidth'] = 0 
         req.pop('vpnCredentials')
+        if len(req['ipAddresses']) == 0:
+            req.pop('ipAddresses')
         #req['vpnCredentials'] = vpnCredentials
         #req.pop('ipAddresses')
         #req['ipAddresses'] = ipAddresses
@@ -286,11 +288,11 @@ def main():
         req.pop('groups')
         if groups:
             req['staticLocationGroups'] = groups
-        
         if req['surrogateIP'] == False:
             req.pop('surrogateIPEnforcedForKnownBrowsers')
             req.pop('surrogateRefreshTimeInMinutes')
             req.pop('surrogateRefreshTimeUnit')
+
 
     else:
         vpnCredentials = []
